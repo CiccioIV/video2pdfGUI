@@ -2,21 +2,29 @@
 
 # Warning
 At the moment, this fork is still under development.
-There are no differences with the original projects.
+The script in its base functionalities is working, though the UI is 
+not optimized and suffers freezes. It does the tasks, however.
+Just leave it working in background, and wait until it finish.
+Currently working on Windows 10, for other OS, it needs to be tested.
 
 # Description
 This is a fork of the original project 'video2pdfslided', by kaushik jeyaraman.
-This fork purpose is to add a GUi and a ready to use Python environment, to make the program usable by non programmers.
+This fork purpose is to add a GUI and a ready to use Python environment, to make the program usable by non programmers.
+The core script purpose is to extract pics from a video, and merge them into a single pdf file.
 All the credits for the core logic goes to former creator, kaushik jeyaraman
 
 # Setup
+As of today, Python3 must be installed on target machines.
+Install all required packages with:
+
 pip install -r requirements.txt
 
 
 # Steps to run the code
-python video2pdfslides.py <video_path>
+python guivideo2pdf.py
 
-it will capture screenshots of unique frames and save it output folder...once screenshots are captured the program is paused and the user is asked to manually verify the screenshots and delete any duplicate images. Once this is done the program continues and creates a pdf out of the screenshots.
+it will capture screenshots of unique frames and save it output folder...once screenshots are captured the program asks the user to manually verify the screenshots and delete any duplicate images.
+Once this is done, hit 'MERGE' button and the program creates a pdf out of the screenshots.
 
 # Example
 There are two sample video avilable in "./input", you can test the code using these input by running
