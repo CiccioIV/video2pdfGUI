@@ -132,30 +132,6 @@ def convert_screenshots_to_pdf(output_folder_screenshot_path, video_path):
     print('pdf saved at', output_pdf_path)
 
 
-def start_gui_conversion(file_path, output_path):
-    """start conversion from GUI
-
-    Args:
-        file_path (str): the file to convert
-        output_path (str): the path vhere to save the output
-    """
-
-    print('file_path', file_path)
-    detect_unique_screenshots(file_path, output_path)
-
-    print('Please Manually verify screenshots and delete duplicates')
-    while True:
-        choice = input("Press y to continue and n to terminate")
-        choice = choice.lower().strip()
-        if choice in ['y', 'n']:
-            break
-        else:
-            print('please enter a valid choice')
-
-    if choice == 'y':
-        convert_screenshots_to_pdf(output_path)
-
-
 
 if __name__ == "__main__":
     
