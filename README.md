@@ -1,6 +1,6 @@
 # video2pdfGUI
 
-#Warning
+# Warning
 At the moment, this fork is still under development.
 There are no differences with the original projects.
 
