@@ -1,7 +1,13 @@
-# video2pdfslides
+# video2pdfGUI
+
+#Warning
+At the moment, this fork is still under development.
+There are no differences with the original projects.
+
 # Description
-This project converts a video presentation into a deck of pdf slides by capturing screenshots of unique frames
-<br> youtube demo: https://www.youtube.com/watch?v=Q0BIPYLoSBs
+This is a fork of the original project 'video2pdfslided', by kaushik jeyaraman.
+This fork purpose is to add a GUi and a ready to use Python environment, to make the program usable by non programmers.
+All the credits for the core logic goes to former creator, kaushik jeyaraman
 
 # Setup
 pip install -r requirements.txt
