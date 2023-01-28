@@ -1,7 +1,5 @@
 import PySimpleGUI as sg
 import video2pdfslides as v2pfd
-from pathlib import Path
-from threading import Thread
 import concurrent.futures
 
 layout = [
