@@ -105,7 +105,8 @@ def detect_unique_screenshots(video_path, output_folder_screenshot_path):
             captured = False
     print(f'{screenshoots_count} screenshots Captured!')
     print(f'Time taken {time.time()-start_time}s')
-    return 
+
+    return screenshoots_count
 
 
 def initialize_output_folder(video_path):
@@ -120,7 +121,7 @@ def initialize_output_folder(video_path):
     return output_folder_screenshot_path
 
 
-def convert_screenshots_to_pdf(output_folder_screenshot_path):
+def convert_screenshots_to_pdf(output_folder_screenshot_path, video_path):
     output_pdf_path = f"{OUTPUT_SLIDES_DIR}/{video_path.rsplit('/')[-1].split('.')[0]}" + '.pdf'
     print('output_folder_screenshot_path', output_folder_screenshot_path)
     print('output_pdf_path', output_pdf_path)
@@ -129,6 +130,31 @@ def convert_screenshots_to_pdf(output_folder_screenshot_path):
         f.write(img2pdf.convert(sorted(glob.glob(f"{output_folder_screenshot_path}/*.png"))))
     print('Pdf Created!')
     print('pdf saved at', output_pdf_path)
+
+
+def start_gui_conversion(file_path, output_path):
+    """start conversion from GUI
+
+    Args:
+        file_path (str): the file to convert
+        output_path (str): the path vhere to save the output
+    """
+
+    print('file_path', file_path)
+    detect_unique_screenshots(file_path, output_path)
+
+    print('Please Manually verify screenshots and delete duplicates')
+    while True:
+        choice = input("Press y to continue and n to terminate")
+        choice = choice.lower().strip()
+        if choice in ['y', 'n']:
+            break
+        else:
+            print('please enter a valid choice')
+
+    if choice == 'y':
+        convert_screenshots_to_pdf(output_path)
+
 
 
 if __name__ == "__main__":
