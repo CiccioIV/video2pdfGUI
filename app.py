@@ -8,15 +8,14 @@ layout = [
              tooltip='Select the file which you wanty to get the slides from',
              key='-BTNFILE-', target='-TXTFILETOCONVERT-',
              enable_events=True)],
-             [sg.Input('', key='-TXTFILETOCONVERT-', visible=False, 
-                readonly=True, enable_events=True, text_color='black',
+             [sg.Input('', key='-TXTFILETOCONVERT-', readonly=True,            enable_events=True, text_color='black',
                 disabled_readonly_background_color=sg.theme_background_color(),
                 expand_x=True)],
              [sg.FolderBrowse('Save to', 
                 tooltip='Select a folder where to save the outputs',
                  key='-BTNSAVEFOLDER-', target='-TXTSAVEFOLDER-',
                  enable_events=True)],
-             [sg.Input('', key='-TXTSAVEFOLDER-', visible=False, 
+             [sg.Input('', key='-TXTSAVEFOLDER-', 
              readonly=True, enable_events=True, text_color='black',
              disabled_readonly_background_color=sg.theme_background_color(),
              expand_x=True)],
@@ -36,19 +35,15 @@ while True:
     if event == "-BTNFILE-" or event == '-TXTFILETOCONVERT-':
         if values['-BTNFILE-'] != "":
             window['-TXTFILETOCONVERT-'].set_tooltip(values['-BTNFILE-'])
-            window['-TXTFILETOCONVERT-'].update(visible=True)
         else:
             window['-TXTFILETOCONVERT-'].set_tooltip('no file selected')
-            window['-TXTFILETOCONVERT-'].update(visible=False)
 
     # select folder browse event
     if event == '-BTNSAVEFOLDER-' or event == '-TXTSAVEFOLDER-':
         if values['-BTNSAVEFOLDER-'] != "":
             window['-TXTSAVEFOLDER-'].set_tooltip(values['-BTNSAVEFOLDER-'])
-            window['-TXTSAVEFOLDER-'].update(visible=True)
     else:
             window['-TXTSAVEFOLDER-'].set_tooltip('no file selected')
-            window['-TXTSAVEFOLDER-'].update(visible=False)
 
     # Enable convert button if all data are provided
     if values['-BTNFILE-'] != "" and values['-BTNSAVEFOLDER-'] != "":
