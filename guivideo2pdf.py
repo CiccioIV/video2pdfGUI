@@ -1,6 +1,9 @@
 import PySimpleGUI as sg
 import video2pdfslides as v2pfd
 import concurrent.futures
+import img.icons
+
+
 
 layout = [
             [sg.Text('Video2pdf GUI')],
@@ -25,7 +28,7 @@ layout = [
              [sg.Output(size=(400,400))],
          ]
 
-window = sg.Window('Video2Pdf GUI', layout, size=(600,500))
+window = sg.Window('Video2Pdf GUI', layout, size=(600,500), icon=img.icons.ICON1)
 
 
 # MAIN WINDOW LOOP
