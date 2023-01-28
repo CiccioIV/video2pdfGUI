@@ -1,3 +1,10 @@
+deprecation==2.1.0
+img2pdf==0.4.4
 imutils==0.5.4
-opencv_python==4.5.2.52
-img2pdf==0.4.1
+lxml==4.9.2
+numpy==1.24.1
+opencv-python==4.7.0.68
+packaging==23.0
+pikepdf==6.2.9
+Pillow==9.4.0
+PySimpleGUI==4.60.4
