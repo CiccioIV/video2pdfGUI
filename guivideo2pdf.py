@@ -79,7 +79,10 @@ core_options_frame = [
 
 
 app_options_frame = [
-                        [sg.Checkbox('auto merge', default=False, key='-CKBAUTOMERGE-', enable_events=True,tooltip=tip_automerge)],
+                        [sg.Checkbox('auto merge', default=False,
+                         key='-CKBAUTOMERGE-',
+                         enable_events=True,
+                         tooltip=tip_automerge)],
                     ]
 
 layout = [
@@ -99,7 +102,8 @@ layout = [
              readonly=True, enable_events=True, text_color='black',
              disabled_readonly_background_color=sg.theme_background_color(),
              expand_x=True)],
-             [sg.Frame('core options', title_color='red', layout=core_options_frame),
+             [sg.Frame('core options', title_color='red',
+             layout=core_options_frame),
              sg.Frame('app options', app_options_frame)],
              [sg.Button('Get Pics', key='-BTNGETPICS-', size=(10,2),
              disabled=True, tooltip=tip_getpics),
@@ -174,7 +178,10 @@ def merge_pics():
     sg.Popup('Conversion ended')
 
 
-window = sg.Window('Video2Pdf GUI', layout,size=(WINDOW_W,WINDOW_H), icon=APPICON)
+window = sg.Window('Video2Pdf GUI',
+                    layout,
+                    size=(WINDOW_W,WINDOW_H),
+                    icon=APPICON)
 window.finalize()
 reset_defaults()
 
