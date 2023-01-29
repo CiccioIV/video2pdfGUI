@@ -6,10 +6,20 @@ import img.icons
 # set tooltips
 tip_framerate = 'no.of frames per second that needs to be processed, fewer the count faster the speed.'
 tip_warmup = 'initial number of frames to be skipped'
+tip_bind_frate_wup = 'If the option is checked, setting the framerate will move the warmup bar as well.\nIf you want to set them separately, set the warmup AFTER the framerate, or uncheck this option to unbind them'
+tip_fgbg_history = 'The number of frames history that effects the background subtractor\nCalculated over framerate value * 15'
 tip_sliderminpct = 'min % of difference between foreground and background to detect if motion has stopped'
 tip_slidermaxpct = 'max % of difference between foreground and background to detect if frame is still in motion'
-tip_threshold = 'Threshold on the squared Mahalanobis distance between the pixel and the model to decide whether a pixel is well described by the background model.'
-tip_detectshadows = 'If true, the algorithm will detect shadows and mark them.'
+tip_threshold = 'Threshold on the squared Mahalanobis distance between the pixel and the model to decide whether a pixel is well described by the background model.\nThis parameter does not affect the background update.'
+tip_detectshadows = 'If true, the algorithm will detect shadows and mark them.\nIt decreases the speed a bit, so if you do not need this feature, set the parameter to false.'
+tip_filebrowser = 'Select the file which you wanty to get the slides from'
+tip_saveto = 'Select a folder where to save the outputs'
+tip_show_i_opts = 'Show the current set options'
+tip_getpics = 'Start the 1st step, getting pics from video file'
+tip_mergepics = 'Start the 2nd process, merging all pics in one .pdf file'
+tip_reset_defaults = 'Reset all options to default values\nUse in case you messed up with options.'
+
+APPICON = img.icons.ICON1
 
 
 # layouts
@@ -18,6 +28,7 @@ option_col1 = [
                 [sg.Slider(range=(1,50), default_value=3, orientation='h', enable_events=True, key='-SLIDERFRAMERATE-', tooltip=tip_framerate)],
                 [sg.Text('Warmup')],
                 [sg.Slider(range=(1,50), default_value=3, orientation='h', enable_events=True, key='-SLIDERWARMUP-', tooltip=tip_warmup)],
+                [sg.Checkbox('bind framerate/warmup', default=True, tooltip=tip_bind_frate_wup, key='-CKBBINDFRATEWUP-', text_color='yellow')],
               ]
 
 option_col2 = [
@@ -30,6 +41,7 @@ option_col3 = [
                 [sg.Text('Threshold')],
                 [sg.Slider(range=(1,50), default_value=16, orientation='h', enable_events=True, key='-SLIDERTHRESHOLD-', tooltip=tip_threshold)],
                 [sg.Checkbox('Detect Shadows', default=False, key='-CKBOXSHADOWS-', tooltip=tip_detectshadows, enable_events=True)],
+                [sg.Text('FGBG history:'), sg.Text('', key='-TXTHISTORY-', text_color='yellow')],
 
               ]
 
@@ -42,16 +54,16 @@ options_frame = [
                 ]
 
 layout = [
-            [sg.Text('Video2pdf GUI')],
             [sg.FileBrowse('Pick a file',
-             tooltip='Select the file which you wanty to get the slides from',
+             tooltip=tip_filebrowser,
              key='-BTNFILE-', target='-TXTFILETOCONVERT-',
              enable_events=True)],
-             [sg.Input('', key='-TXTFILETOCONVERT-', readonly=True,            enable_events=True, text_color='black',
+             [sg.Input('', key='-TXTFILETOCONVERT-', readonly=True,
+                enable_events=True, text_color='black',
                 disabled_readonly_background_color=sg.theme_background_color(),
                 expand_x=True)],
              [sg.FolderBrowse('Save to', 
-                tooltip='Select a folder where to save the outputs',
+                tooltip=tip_saveto,
                  key='-BTNSAVEFOLDER-', target='-TXTSAVEFOLDER-',
                  enable_events=True)],
              [sg.Input('', key='-TXTSAVEFOLDER-', 
@@ -59,22 +71,49 @@ layout = [
              disabled_readonly_background_color=sg.theme_background_color(),
              expand_x=True)],
              [sg.Frame('options', title_color='red', layout=options_frame)],
-             [sg.Button('Show internal options', key='-BTNGETOPT-', enable_events=True, tooltip='Show the current set options')],
+             [sg.Button('Show internal options', key='-BTNGETOPT-', enable_events=True, tooltip=tip_show_i_opts),
+             sg.Button('reset to default', enable_events=True, key='-BTNRESETDEFAULT-', tooltip=tip_reset_defaults)],
              [sg.Button('Get Picks', key='-BTNGETPICS-', size=(10,2),
-             disabled=True, tooltip='Start the 1st step, getting pics fro video file')],
-             [sg.Button('MERGE PICS', tooltip="Start the 2nd process, merging all pics in one .pdf file", size=(10,2),enable_events=True, disabled=True, key='-BTNMERGE-')],
+             disabled=True, tooltip=tip_getpics)],
+             [sg.Button('MERGE PICS', tooltip=tip_mergepics, size=(10,2),enable_events=True, disabled=True, key='-BTNMERGE-')],
              [sg.Output(size=(400,400), key='-OUT-')],
           ]
 
 
 # Functions
 def get_current_settings():
-    vars = [v2pfd.FRAME_RATE, v2pfd.WARMUP, v2pfd.FGBG_HISTORY, v2pfd.VAR_THRESHOLD, v2pfd.DETECT_SHADOWS, v2pfd.MIN_PERCENT, v2pfd.MAX_PERCENT]
+    """Get the current global vars status from core module
 
+    Returns:
+        str: formatted string with vars values
+    """
     return f"framerate:{v2pfd.FRAME_RATE}\nwarmup:{v2pfd.WARMUP}\nfgbg history:{v2pfd.FGBG_HISTORY}\nthreshold:{v2pfd.VAR_THRESHOLD}\ndetect shadows:{v2pfd.DETECT_SHADOWS}\nmin%:{v2pfd.MIN_PERCENT}\nmax%{v2pfd.MAX_PERCENT}"
+
+def reset_defaults():
+    v2pfd.FRAME_RATE         = 3
+    v2pfd.WARMUP             = 3
+    v2pfd.MIN_PERCENT        = 0.1
+    v2pfd.MAX_PERCENT        = 3
+    v2pfd.VAR_THRESHOLD      = 16
+    v2pfd.DETECT_SHADOWS     = False
+    v2pfd.FGBG_HISTORY       = v2pfd.FRAME_RATE *15
+
+    window['-SLIDERFRAMERATE-'].update(value=v2pfd.FRAME_RATE)
+    window['-SLIDERWARMUP-'].update(value=v2pfd.WARMUP)
+    window['-TXTHISTORY-'].update(value=v2pfd.FGBG_HISTORY)
+    window['-SLIDERMINPCT-'].update(value=v2pfd.MIN_PERCENT)
+    window['-SLIDERMAXPCT-'].update(value=v2pfd.MAX_PERCENT)
+    window['-SLIDERTHRESHOLD-'].update(value=v2pfd.VAR_THRESHOLD)
+    window['-CKBOXSHADOWS-'].update(value=v2pfd.DETECT_SHADOWS)
+    window['-CKBBINDFRATEWUP-'].update(value=True)
+
+    window.refresh()
+    
          
 
-window = sg.Window('Video2Pdf GUI', layout,size=(600,500), icon=img.icons.ICON1)
+window = sg.Window('Video2Pdf GUI', layout,size=(600,500), icon=APPICON)
+window.finalize()
+reset_defaults()
 
 
 # MAIN WINDOW LOOP
@@ -100,12 +139,13 @@ while True:
     if event == '-SLIDERFRAMERATE-':
         v2pfd.FRAME_RATE = values['-SLIDERFRAMERATE-']
         # set fgbg according to framerate
-        v2pfd.FGBG_HISTORY = values['-SLIDERFRAMERATE-']*15
+        v2pfd.FGBG_HISTORY = int(values['-SLIDERFRAMERATE-'])*15
+        window['-TXTHISTORY-'].update(v2pfd.FGBG_HISTORY)
         # if framerate is updated, syncs the warmup slider as well
         # need to find out how to move the slider actually
-        window['-SLIDERWARMUP-'].update(value=values['-SLIDERFRAMERATE-'])
-        v2pfd.WARMUP = values['-SLIDERFRAMERATE-']
-        window.refresh()
+        if values['-CKBBINDFRATEWUP-']:
+            window['-SLIDERWARMUP-'].update(value=values['-SLIDERFRAMERATE-'])
+            v2pfd.WARMUP = values['-SLIDERFRAMERATE-']
     if event == '-SLIDERWARMUP-':
         v2pfd.WARMUP = values['-SLIDERWARMUP-']
     if event == '-SLIDERMINPCT-':
@@ -123,6 +163,10 @@ while True:
             sg.Popup(get_current_settings())
     except Exception as e:
         sg.Popup(e)
+
+    # reset options to default values
+    if event == '-BTNRESETDEFAULT-':
+        reset_defaults()
 
 
     # Enable convert button if all data are provided
@@ -148,6 +192,7 @@ while True:
         except Exception as e:
             print(e)
         
+    # merge event    
     if event == '-BTNMERGE-':
         try:
             v2pfd.convert_screenshots_to_pdf(values['-BTNSAVEFOLDER-'], values['-BTNFILE-'])
