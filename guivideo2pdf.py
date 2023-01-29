@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 import video2pdfslides as v2pdf
 import concurrent.futures
 import img.icons
+import os
 
 # set tooltips
 tip_framerate = 'no.of frames per second that needs to be processed, fewer the count faster the speed.'
@@ -141,7 +142,37 @@ def reset_defaults():
 
     window.refresh()
     
-         
+
+def get_pics():
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        fn = executor.submit(v2pdf.detect_unique_screenshots, 
+                            values['-BTNFILE-'],
+                                values['-BTNSAVEFOLDER-'])
+        res = fn.result()
+        
+    print(f"captured screenshots: {res}")
+    window.refresh()
+    # enable merge button if pics created
+    if int(res) >0:
+        # calls 2nd step if automerge set to true
+        if values['-CKBAUTOMERGE-']:
+            print('auto merge set True. Auto merging pics')
+            window.refresh()
+            merge_pics() 
+            return
+        # otherwise ask user for 2nd step
+        sg.Popup(f'{res} pics returned.\nClick "Ok" button here to open {values["-BTNSAVEFOLDER-"]}folder, delete duplicated or unwanted pics in the output folder, and then hit "MERGE" button in the main app window to merge all pics into pdf file.')
+        os.startfile(fr'{values["-BTNSAVEFOLDER-"]}' ) #auto open output folder
+        window['-BTNMERGE-'].update(disabled=False)
+    else:
+        window['-BTNMERGE-'].update(disabled=True)
+
+
+def merge_pics():
+    v2pdf.convert_screenshots_to_pdf(values['-BTNSAVEFOLDER-'],
+                                    values['-BTNFILE-'])
+    sg.Popup('Conversion ended')
+
 
 window = sg.Window('Video2Pdf GUI', layout,size=(WINDOW_W,WINDOW_H), icon=APPICON)
 window.finalize()
@@ -210,29 +241,14 @@ while True:
     # merge pics button event
     if event == '-BTNGETPICS-':
         try:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                 fn = executor.submit(v2pdf.detect_unique_screenshots, 
-                                        values['-BTNFILE-'],
-                                         values['-BTNSAVEFOLDER-'])
-                 res = fn.result()
-                 
-            print(f"captured screenshots: {res}")
-            window.refresh()
-            # enable merge button if pics created
-            if int(res) >0:
-                sg.Popup(f'{res} pics returned.\nPlease open {values["-BTNSAVEFOLDER-"]}folder, delete unwanted pics, and hit "MERGE" button.')
-                window['-BTNMERGE-'].update(disabled=False)
-            else:
-                window['-BTNMERGE-'].update(disabled=True)
+            get_pics()
         except Exception as e:
             print(e)
         
     # merge event    
     if event == '-BTNMERGE-':
         try:
-            v2pdf.convert_screenshots_to_pdf(values['-BTNSAVEFOLDER-'],
-                                             values['-BTNFILE-'])
-            sg.Popup('Conversion ended')
+            merge_pics()
         except Exception as e:
             print(e)
         
