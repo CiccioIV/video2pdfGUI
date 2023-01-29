@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-import video2pdfslides as v2pfd
+import video2pdfslides as v2pdf
 import concurrent.futures
 import img.icons
 
@@ -17,43 +17,69 @@ tip_saveto = 'Select a folder where to save the outputs'
 tip_show_i_opts = 'Show the current set options'
 tip_getpics = 'Start the 1st step, getting pics from video file'
 tip_mergepics = 'Start the 2nd process, merging all pics in one .pdf file'
-tip_reset_defaults = 'Reset all options to default values\nUse in case you messed up with options.'
+tip_reset_defaults = 'Reset all core options to default values\nUse in case you messed up with options.\nApp options are unaffected by the reset'
+tip_core_options_frame = 'These are the core options of the script.\nThey affects directly the conversion algorhytms.\nYou have to play with them if the conversion result does not matches with your expectations.'
+tip_automerge = 'Check this option if you want to skip the 2nd step and automatically merge all the pics inside the output folder.\nThis is the quickest option to get final result, but the resulting file may have duplicated pics.'
 
 APPICON = img.icons.ICON1
+WINDOW_W = 800
+WINDOW_H = 600
 
 
 # layouts
-option_col1 = [
+core_option_col1 = [
                 [sg.Text('Frame rate')],
-                [sg.Slider(range=(1,50), default_value=3, orientation='h', enable_events=True, key='-SLIDERFRAMERATE-', tooltip=tip_framerate)],
+                [sg.Slider(range=(1,50), default_value=3, orientation='h', 
+                enable_events=True, key='-SLIDERFRAMERATE-', 
+                tooltip=tip_framerate)],
                 [sg.Text('Warmup')],
-                [sg.Slider(range=(1,50), default_value=3, orientation='h', enable_events=True, key='-SLIDERWARMUP-', tooltip=tip_warmup)],
-                [sg.Checkbox('bind framerate/warmup', default=True, tooltip=tip_bind_frate_wup, key='-CKBBINDFRATEWUP-', text_color='yellow')],
+                [sg.Slider(range=(1,50), default_value=3, orientation='h',
+                 enable_events=True, key='-SLIDERWARMUP-', 
+                 tooltip=tip_warmup)],
+                [sg.Checkbox('bind framerate/warmup', default=True,
+                 tooltip=tip_bind_frate_wup, key='-CKBBINDFRATEWUP-', 
+                 text_color='yellow')],
               ]
 
-option_col2 = [
+core_option_col2 = [
                 [sg.Text('Min/Max percent')],
-                [sg.Slider(range=(0.1,5.0), default_value=0.1, orientation='h', enable_events=True, key='-SLIDERMINPCT-', tooltip=tip_sliderminpct,resolution=0.1)],
-                [sg.Slider(range=(0.1,5.0), default_value=3, orientation='h', enable_events=True, key='-SLIDERMAXPCT-', tooltip=tip_slidermaxpct, resolution=0.1)],
+                [sg.Slider(range=(0.1,5.0), default_value=0.1, orientation='h', 
+                enable_events=True, key='-SLIDERMINPCT-', 
+                tooltip=tip_sliderminpct,resolution=0.1)],
+                [sg.Slider(range=(0.1,5.0), default_value=3, orientation='h',
+                 enable_events=True, key='-SLIDERMAXPCT-',
+                 tooltip=tip_slidermaxpct, resolution=0.1)],
               ]
 
-option_col3 = [
+core_option_col3 = [
                 [sg.Text('Threshold')],
-                [sg.Slider(range=(1,50), default_value=16, orientation='h', enable_events=True, key='-SLIDERTHRESHOLD-', tooltip=tip_threshold)],
-                [sg.Checkbox('Detect Shadows', default=False, key='-CKBOXSHADOWS-', tooltip=tip_detectshadows, enable_events=True)],
-                [sg.Text('FGBG history:'), sg.Text('', key='-TXTHISTORY-', text_color='yellow')],
+                [sg.Slider(range=(1,50), default_value=16, orientation='h', 
+                enable_events=True, key='-SLIDERTHRESHOLD-',
+                tooltip=tip_threshold)],
+                [sg.Checkbox('Detect Shadows', default=False,
+                key='-CKBOXSHADOWS-', tooltip=tip_detectshadows,
+                enable_events=True)],
+                [sg.Text('FGBG history:'),
+                 sg.Text('', key='-TXTHISTORY-', text_color='yellow')],
 
               ]
 
-options_frame = [
-                    [sg.Column(option_col1),
+core_options_frame = [
+                    [sg.Column(core_option_col1),
                     sg.VerticalSeparator(),
-                    sg.Column(option_col2),
+                    sg.Column(core_option_col2),
                     sg.VerticalSeparator(),               
-                    sg.Column(option_col3)],    
-                    [sg.Button('Show internal options', key='-BTNGETOPT-', enable_events=True, tooltip=tip_show_i_opts),
-                     sg.Button('reset to default', enable_events=True, key='-BTNRESETDEFAULT-', tooltip=tip_reset_defaults)],
+                    sg.Column(core_option_col3)],    
+                    [sg.Button('Show internal options', key='-BTNGETOPT-',
+                     enable_events=True, tooltip=tip_show_i_opts),
+                     sg.Button('reset to default', enable_events=True,
+                     key='-BTNRESETDEFAULT-', tooltip=tip_reset_defaults)],
                 ]
+
+
+app_options_frame = [
+                        [sg.Checkbox('auto merge', default=False, key='-CKBAUTOMERGE-', enable_events=True,tooltip=tip_automerge)],
+                    ]
 
 layout = [
             [sg.FileBrowse('Pick a file',
@@ -72,11 +98,14 @@ layout = [
              readonly=True, enable_events=True, text_color='black',
              disabled_readonly_background_color=sg.theme_background_color(),
              expand_x=True)],
-             [sg.Frame('options', title_color='red', layout=options_frame)],
+             [sg.Frame('core options', title_color='red', layout=core_options_frame),
+             sg.Frame('app options', app_options_frame)],
              [sg.Button('Get Pics', key='-BTNGETPICS-', size=(10,2),
-             disabled=True, tooltip=tip_getpics)],
-             [sg.Button('MERGE PICS', tooltip=tip_mergepics, size=(10,2),enable_events=True, disabled=True, key='-BTNMERGE-')],
-             [sg.Output(size=(400,400), key='-OUT-')],
+             disabled=True, tooltip=tip_getpics),
+             sg.Button('MERGE PICS', tooltip=tip_mergepics,
+              size=(10,2),enable_events=True, 
+              disabled=True, key='-BTNMERGE-')],
+             [sg.Output(size=(WINDOW_W,10), key='-OUT-')],
           ]
 
 
@@ -87,34 +116,34 @@ def get_current_settings():
     Returns:
         str: formatted string with vars values
     """
-    return f"framerate:{v2pfd.FRAME_RATE}\nwarmup:{v2pfd.WARMUP}\nfgbg history:{v2pfd.FGBG_HISTORY}\nthreshold:{v2pfd.VAR_THRESHOLD}\ndetect shadows:{v2pfd.DETECT_SHADOWS}\nmin%:{v2pfd.MIN_PERCENT}\nmax%{v2pfd.MAX_PERCENT}"
+    return f"framerate:{v2pdf.FRAME_RATE}\nwarmup:{v2pdf.WARMUP}\nfgbg history:{v2pdf.FGBG_HISTORY}\nthreshold:{v2pdf.VAR_THRESHOLD}\ndetect shadows:{v2pdf.DETECT_SHADOWS}\nmin%:{v2pdf.MIN_PERCENT}\nmax%{v2pdf.MAX_PERCENT}"
 
 def reset_defaults():
     """reset all option values to their defaults
     and updates the ui acccording
     """
-    v2pfd.FRAME_RATE         = 3
-    v2pfd.WARMUP             = 3
-    v2pfd.MIN_PERCENT        = 0.1
-    v2pfd.MAX_PERCENT        = 3
-    v2pfd.VAR_THRESHOLD      = 16
-    v2pfd.DETECT_SHADOWS     = False
-    v2pfd.FGBG_HISTORY       = v2pfd.FRAME_RATE *15
+    v2pdf.FRAME_RATE         = 3
+    v2pdf.WARMUP             = 3
+    v2pdf.MIN_PERCENT        = 0.1
+    v2pdf.MAX_PERCENT        = 3
+    v2pdf.VAR_THRESHOLD      = 16
+    v2pdf.DETECT_SHADOWS     = False
+    v2pdf.FGBG_HISTORY       = v2pdf.FRAME_RATE *15
 
-    window['-SLIDERFRAMERATE-'].update(value=v2pfd.FRAME_RATE)
-    window['-SLIDERWARMUP-'].update(value=v2pfd.WARMUP)
-    window['-TXTHISTORY-'].update(value=v2pfd.FGBG_HISTORY)
-    window['-SLIDERMINPCT-'].update(value=v2pfd.MIN_PERCENT)
-    window['-SLIDERMAXPCT-'].update(value=v2pfd.MAX_PERCENT)
-    window['-SLIDERTHRESHOLD-'].update(value=v2pfd.VAR_THRESHOLD)
-    window['-CKBOXSHADOWS-'].update(value=v2pfd.DETECT_SHADOWS)
+    window['-SLIDERFRAMERATE-'].update(value=v2pdf.FRAME_RATE)
+    window['-SLIDERWARMUP-'].update(value=v2pdf.WARMUP)
+    window['-TXTHISTORY-'].update(value=v2pdf.FGBG_HISTORY)
+    window['-SLIDERMINPCT-'].update(value=v2pdf.MIN_PERCENT)
+    window['-SLIDERMAXPCT-'].update(value=v2pdf.MAX_PERCENT)
+    window['-SLIDERTHRESHOLD-'].update(value=v2pdf.VAR_THRESHOLD)
+    window['-CKBOXSHADOWS-'].update(value=v2pdf.DETECT_SHADOWS)
     window['-CKBBINDFRATEWUP-'].update(value=True)
 
     window.refresh()
     
          
 
-window = sg.Window('Video2Pdf GUI', layout,size=(600,500), icon=APPICON)
+window = sg.Window('Video2Pdf GUI', layout,size=(WINDOW_W,WINDOW_H), icon=APPICON)
 window.finalize()
 reset_defaults()
 
@@ -140,25 +169,25 @@ while True:
 
     # set options
     if event == '-SLIDERFRAMERATE-':
-        v2pfd.FRAME_RATE = values['-SLIDERFRAMERATE-']
+        v2pdf.FRAME_RATE = values['-SLIDERFRAMERATE-']
         # set fgbg according to framerate
-        v2pfd.FGBG_HISTORY = int(values['-SLIDERFRAMERATE-'])*15
-        window['-TXTHISTORY-'].update(v2pfd.FGBG_HISTORY)
+        v2pdf.FGBG_HISTORY = int(values['-SLIDERFRAMERATE-'])*15
+        window['-TXTHISTORY-'].update(v2pdf.FGBG_HISTORY)
         # if framerate is updated, syncs the warmup slider as well
         # need to find out how to move the slider actually
         if values['-CKBBINDFRATEWUP-']:
             window['-SLIDERWARMUP-'].update(value=values['-SLIDERFRAMERATE-'])
-            v2pfd.WARMUP = values['-SLIDERFRAMERATE-']
+            v2pdf.WARMUP = values['-SLIDERFRAMERATE-']
     if event == '-SLIDERWARMUP-':
-        v2pfd.WARMUP = values['-SLIDERWARMUP-']
+        v2pdf.WARMUP = values['-SLIDERWARMUP-']
     if event == '-SLIDERMINPCT-':
-        v2pfd.MIN_PERCENT = values['-SLIDERMINPCT-']
+        v2pdf.MIN_PERCENT = values['-SLIDERMINPCT-']
     if event == '-SLIDERMAXPCT-':
-        v2pfd.MAX_PERCENT = values['-SLIDERMAXPCT-']
+        v2pdf.MAX_PERCENT = values['-SLIDERMAXPCT-']
     if event == '-SLIDERTHRESHOLD-':
-        v2pfd.VAR_THRESHOLD = values['-SLIDERTHRESHOLD-']
+        v2pdf.VAR_THRESHOLD = values['-SLIDERTHRESHOLD-']
     if event == '-CKBOXSHADOWS-':
-        v2pfd.DETECT_SHADOWS = values['-CKBOXSHADOWS-']
+        v2pdf.DETECT_SHADOWS = values['-CKBOXSHADOWS-']
 
     try:
         if event == '-BTNGETOPT-':
@@ -182,10 +211,13 @@ while True:
     if event == '-BTNGETPICS-':
         try:
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                 fn = executor.submit(v2pfd.detect_unique_screenshots, values['-BTNFILE-'], values['-BTNSAVEFOLDER-'])
+                 fn = executor.submit(v2pdf.detect_unique_screenshots, 
+                                        values['-BTNFILE-'],
+                                         values['-BTNSAVEFOLDER-'])
                  res = fn.result()
                  
             print(f"captured screenshots: {res}")
+            window.refresh()
             # enable merge button if pics created
             if int(res) >0:
                 sg.Popup(f'{res} pics returned.\nPlease open {values["-BTNSAVEFOLDER-"]}folder, delete unwanted pics, and hit "MERGE" button.')
@@ -198,7 +230,8 @@ while True:
     # merge event    
     if event == '-BTNMERGE-':
         try:
-            v2pfd.convert_screenshots_to_pdf(values['-BTNSAVEFOLDER-'], values['-BTNFILE-'])
+            v2pdf.convert_screenshots_to_pdf(values['-BTNSAVEFOLDER-'],
+                                             values['-BTNFILE-'])
             sg.Popup('Conversion ended')
         except Exception as e:
             print(e)
