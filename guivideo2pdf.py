@@ -51,6 +51,8 @@ options_frame = [
                     sg.Column(option_col2),
                     sg.VerticalSeparator(),               
                     sg.Column(option_col3)],    
+                    [sg.Button('Show internal options', key='-BTNGETOPT-', enable_events=True, tooltip=tip_show_i_opts),
+                     sg.Button('reset to default', enable_events=True, key='-BTNRESETDEFAULT-', tooltip=tip_reset_defaults)],
                 ]
 
 layout = [
@@ -71,9 +73,7 @@ layout = [
              disabled_readonly_background_color=sg.theme_background_color(),
              expand_x=True)],
              [sg.Frame('options', title_color='red', layout=options_frame)],
-             [sg.Button('Show internal options', key='-BTNGETOPT-', enable_events=True, tooltip=tip_show_i_opts),
-             sg.Button('reset to default', enable_events=True, key='-BTNRESETDEFAULT-', tooltip=tip_reset_defaults)],
-             [sg.Button('Get Picks', key='-BTNGETPICS-', size=(10,2),
+             [sg.Button('Get Pics', key='-BTNGETPICS-', size=(10,2),
              disabled=True, tooltip=tip_getpics)],
              [sg.Button('MERGE PICS', tooltip=tip_mergepics, size=(10,2),enable_events=True, disabled=True, key='-BTNMERGE-')],
              [sg.Output(size=(400,400), key='-OUT-')],
@@ -90,6 +90,9 @@ def get_current_settings():
     return f"framerate:{v2pfd.FRAME_RATE}\nwarmup:{v2pfd.WARMUP}\nfgbg history:{v2pfd.FGBG_HISTORY}\nthreshold:{v2pfd.VAR_THRESHOLD}\ndetect shadows:{v2pfd.DETECT_SHADOWS}\nmin%:{v2pfd.MIN_PERCENT}\nmax%{v2pfd.MAX_PERCENT}"
 
 def reset_defaults():
+    """reset all option values to their defaults
+    and updates the ui acccording
+    """
     v2pfd.FRAME_RATE         = 3
     v2pfd.WARMUP             = 3
     v2pfd.MIN_PERCENT        = 0.1
